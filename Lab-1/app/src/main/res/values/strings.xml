@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Lab-1</string>
+    <string name="title">中山大学课外体育积分电子认证系统</string>
+    <string name="username">用户名:</string>
+    <string name="input_username">请输入用户名</string>
+    <string name="password">密码:</string>
+    <string name="student">学生</string>
+    <string name="teacher">老师</string>
+    <string name="associations">社团</string>
+    <string name="administrator">管理者</string>
+    <string name="input_password">请输入密码</string>
+    <string name="login">登录</string>
+    <string name="signup">注册</string>
 </resources>
