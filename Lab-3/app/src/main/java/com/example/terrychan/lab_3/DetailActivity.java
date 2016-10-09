@@ -1,5 +1,7 @@
 package com.example.terrychan.lab_3;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -24,6 +27,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView name, tel, type, location;
     private Contact contact;
     private ImageView back, star;
+    private RelativeLayout background;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class DetailActivity extends AppCompatActivity {
         contact = (Contact) getIntent().getSerializableExtra("contact");
         back = (ImageView) findViewById(R.id.back);
         star = (ImageView) findViewById(R.id.star);
+        background = (RelativeLayout) findViewById(R.id.background);
     }
 
     private void setText() {
@@ -52,6 +57,7 @@ public class DetailActivity extends AppCompatActivity {
         tel.setText(contact.getTel());
         type.setText(contact.getType());
         location.setText(contact.getLocation());
+        background.setBackgroundColor(Color.parseColor(String.format("#%s", contact.getColor())));
         if (contact.isStar())
             star.setImageResource(R.mipmap.full_star);
         else

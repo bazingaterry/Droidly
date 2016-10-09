@@ -31,6 +31,9 @@ public class Contact implements Serializable {
         return location;
     }
 
+    public String getColor() {
+        return color;
+    }
 
     public boolean isStar() {
         return star;
