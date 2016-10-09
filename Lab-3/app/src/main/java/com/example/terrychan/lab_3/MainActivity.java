@@ -1,6 +1,7 @@
 package com.example.terrychan.lab_3;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setContactListView();
         setLongPressResponse();
-
+        setClickResponse();
     }
 
     private void setLongPressResponse() {
@@ -77,7 +78,10 @@ public class MainActivity extends AppCompatActivity {
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // TODO: 09/10/2016  这里还没有写完哈哈哈哈
+                Contact contact = contacts.get(i);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("contact", contact);
+                startActivity(intent);
             }
         });
     }

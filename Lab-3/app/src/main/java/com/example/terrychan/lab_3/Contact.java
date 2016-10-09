@@ -1,10 +1,13 @@
 package com.example.terrychan.lab_3;
 
+import java.io.Serializable;
+
 /**
  * Created by terrychan on 10/9/16.
  */
 
-public class Contact {
+public class Contact implements Serializable {
+    private static final long serialVersionUID = -1L;
     private String name, tel, type, location, color;
     private boolean star;
 
@@ -28,9 +31,6 @@ public class Contact {
         return location;
     }
 
-    public String getColor() {
-        return color;
-    }
 
     public boolean isStar() {
         return star;
@@ -38,22 +38,6 @@ public class Contact {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 
     public void setStar(boolean star) {
