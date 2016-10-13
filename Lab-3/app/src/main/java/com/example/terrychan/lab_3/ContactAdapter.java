@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +13,7 @@ import java.util.List;
  */
 
 public class ContactAdapter extends BaseAdapter {
-    private List<Contact> contacts = new ArrayList<>();
+    private List<Contact> contacts;
     private Context context;
 
     public ContactAdapter(List<Contact> contacts, Context context) {
@@ -39,18 +38,11 @@ public class ContactAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup view_group) {
-        ContactViewHolder holder;
-        if (view == null) {
-            holder = new ContactViewHolder();
-            view = View.inflate(this.context, R.layout.contact_element, null);
-            holder.first_letter = (TextView) view.findViewById(R.id.contact_first_letter);
-            holder.name = (TextView) view.findViewById(R.id.contact_name);
-            view.setTag(holder);
-        } else {
-            holder = (ContactViewHolder) view.getTag();
-        }
-        holder.first_letter.setText(this.contacts.get(i).getFirstLetter());
-        holder.name.setText(this.contacts.get(i).getName());
+        view = View.inflate(this.context, R.layout.contact_element, null);
+        TextView contact_first_letter = (TextView) view.findViewById(R.id.contact_first_letter);
+        contact_first_letter.setText(this.contacts.get(i).getFirstLetter());
+        TextView name = (TextView) view.findViewById(R.id.contact_name);
+        name.setText(this.contacts.get(i).getName());
         return view;
     }
 }

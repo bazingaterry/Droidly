@@ -1,8 +1,6 @@
 package com.example.terrychan.lab_3;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -33,14 +31,14 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_detail);
-        setView();
+        getView();
         setText();
         setClickStarResponse();
         setBackResponse();
         contact_operation.setAdapter(new OperationAdapter(contact_operation_string, this));
     }
 
-    private void setView() {
+    private void getView() {
         contact_operation = (ListView) findViewById(R.id.contact_operation);
         name = (TextView) findViewById(R.id.name);
         tel = (TextView) findViewById(R.id.tel);
