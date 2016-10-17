@@ -10,8 +10,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.terrychan.lab_4.MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/dynamic_broadcast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="动态注册"
+        android:layout_below="@+id/static_broadcast"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp" />
+
+    <Button
+        android:id="@+id/static_broadcast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="静态注册"
+        android:layout_marginTop="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/dynamic_broadcast" />
 </RelativeLayout>
