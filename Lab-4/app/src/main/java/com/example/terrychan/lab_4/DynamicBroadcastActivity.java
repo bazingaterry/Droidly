@@ -42,19 +42,18 @@ public class DynamicBroadcastActivity extends AppCompatActivity {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(action)) {
-                    String msg = intent.getStringExtra("msg");
-                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                    builder.setContentTitle("动态广播")
-                            .setContentText(msg)
-                            .setTicker("动态通知")
-                            .setSmallIcon(R.mipmap.dynamic)
-                            .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamic))
-                            .setAutoCancel(true)
-                            .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0));
-                    notificationManager.notify(0, builder.build());
-                }
+                String msg = intent.getStringExtra("msg");
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                builder.setContentTitle("动态广播")
+                        .setContentText(msg)
+                        .setTicker("动态通知")
+                        .setSmallIcon(R.mipmap.dynamic)
+                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamic))
+                        .setAutoCancel(true)
+                        .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0));
+                notificationManager.notify(0, builder.build());
+
             }
         };
         regButton.setOnClickListener(new View.OnClickListener() {
