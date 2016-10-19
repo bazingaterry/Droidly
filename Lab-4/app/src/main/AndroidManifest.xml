@@ -28,7 +28,7 @@
 
         <receiver android:name=".StaticReceiver">
             <intent-filter>
-                <action android:name="com.example.terrychan.receive" />
+                <action android:name="com.example.terrychan.STATIC" />
             </intent-filter>
         </receiver>
 
