@@ -53,7 +53,6 @@ public class DynamicBroadcastActivity extends AppCompatActivity {
                         .setAutoCancel(true)
                         .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0));
                 notificationManager.notify(0, builder.build());
-
             }
         };
         regButton.setOnClickListener(new View.OnClickListener() {
