@@ -2,7 +2,9 @@ package com.example.terrychan.lab_4;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import static com.example.terrychan.lab_4.Widget.updateAppWidgetDetail;
 
 /**
  * Created by terrychan on 18/10/2016.
@@ -42,17 +46,25 @@ public class DynamicBroadcastActivity extends AppCompatActivity {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String msg = intent.getStringExtra("msg");
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                builder.setContentTitle("动态广播")
-                        .setContentText(msg)
-                        .setTicker("动态通知")
-                        .setSmallIcon(R.mipmap.dynamic)
-                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamic))
-                        .setAutoCancel(true)
-                        .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0));
-                notificationManager.notify(0, builder.build());
+                if (intent.getAction().equals(action)) {
+                    String msg = intent.getStringExtra("msg");
+                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                    builder.setContentTitle("动态广播")
+                            .setContentText(msg)
+                            .setTicker("动态通知")
+                            .setSmallIcon(R.mipmap.dynamic)
+                            .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamic))
+                            .setAutoCancel(true)
+                            .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0));
+                    notificationManager.notify(0, builder.build());
+
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                    for (int appWidgetId :
+                            appWidgetManager.getAppWidgetIds(new ComponentName(context, Widget.class))) {
+                        updateAppWidgetDetail(context, appWidgetManager, appWidgetId, msg, R.mipmap.dynamic);
+                    }
+                }
             }
         };
         regButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +90,14 @@ public class DynamicBroadcastActivity extends AppCompatActivity {
                 sendBroadcast(intent);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isRegistered) {
+            unregisterReceiver(broadcastReceiver);
+        }
     }
 }
 
