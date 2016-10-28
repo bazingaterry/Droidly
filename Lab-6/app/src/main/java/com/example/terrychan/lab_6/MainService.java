@@ -12,19 +12,25 @@ import android.support.annotation.Nullable;
  */
 
 public class MainService extends Service {
-    MediaPlayer mediaPlayer = new MediaPlayer();
 
-    class MyBinder extends Binder {
-        MediaPlayer mediaPlayer;
+    class MusicPlayerBinder extends Binder {
+        public MediaPlayer mediaPlayer;
 
-        public MyBinder(MediaPlayer mediaPlayer) {
+        public MusicPlayerBinder(MediaPlayer mediaPlayer) {
             this.mediaPlayer = mediaPlayer;
         }
     }
 
+    public MediaPlayer mediaPlayer;
+
+    public MainService() {
+        mediaPlayer = new MediaPlayer();
+    }
+
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return new MyBinder(mediaPlayer);
+        return new MusicPlayerBinder(mediaPlayer);
     }
 }
