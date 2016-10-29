@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     Button playBtn, stopBtn, quitBtn;
     ServiceConnection connection;
     MainService.MusicPlayerBinder musicPlayerBinder;
+    // https://developer.android.com/reference/android/media/MediaPlayer.html
     MediaPlayer mediaPlayer;
     SimpleDateFormat simpleDateFormat;
     Handler handler;
@@ -91,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        playerState = idle;
         Intent intent = new Intent(this, MainService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
+        playerState = idle;
         objectAnimator = ObjectAnimator.ofFloat(imageView, "rotation", 0, 360);
         objectAnimator.setDuration(20000);
         objectAnimator.setInterpolator(new LinearInterpolator());
@@ -106,64 +107,32 @@ public class MainActivity extends AppCompatActivity {
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v("onClick", playerState.name());
-                if (playerState == idle) {
-                    try {
-                        mediaPlayer.setDataSource("/storage/emulated/0/Music/my little airport - 土瓜湾情歌.mp3");
-                        mediaPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                Log.v("PLAY Btn onClick", playerState.name());
+                if (playerState == playing) {
+                    mediaPlayer.pause();
+                    playBtn.setText("PLAY");
+                    state.setText("PAUSED");
+                    objectAnimator.pause();
+                    playerState = paused;
+                } else {
+                    if (playerState == idle) {
+                        try {
+                            mediaPlayer.setDataSource("/storage/emulated/0/Music/my little airport - 土瓜湾情歌.mp3");
+                            mediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        objectAnimator.start();
+                    } else if (playerState == paused) {
+                        objectAnimator.resume();
                     }
                     mediaPlayer.start();
                     playerState = playing;
-                    state.setVisibility(View.INVISIBLE);
+                    state.setText("PLAYING");
                     playBtn.setText("PAUSE");
+                    state.setVisibility(View.VISIBLE);
                     totalTime.setText(simpleDateFormat.format(mediaPlayer.getDuration()));
                     seekBar.setMax(mediaPlayer.getDuration());
-                    objectAnimator.start();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while (playerState == playing) {
-                                handler.sendEmptyMessage(mediaPlayer.getCurrentPosition());
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }).start();
-                } else if (playerState == playing) {
-                    mediaPlayer.pause();
-                    playBtn.setText("PLAY");
-                    objectAnimator.pause();
-                    playerState = paused;
-                } else if (playerState == prepared) {
-                    mediaPlayer.start();
-                    playerState = playing;
-                    state.setVisibility(View.INVISIBLE);
-                    playBtn.setText("PAUSE");
-                    totalTime.setText(simpleDateFormat.format(mediaPlayer.getDuration()));
-                    objectAnimator.start();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while (playerState == playing) {
-                                handler.sendEmptyMessage(mediaPlayer.getCurrentPosition());
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }).start();
-                } else if (playerState == paused) {
-                    mediaPlayer.start();
-                    playBtn.setText("PAUSE");
-                    objectAnimator.resume();
-                    playerState = playing;
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -180,9 +149,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.v("STOP Btn onClick", playerState.name());
                 if (playerState != idle) {
                     mediaPlayer.stop();
                     mediaPlayer.reset();
@@ -199,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
         quitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayer.stop();
+                if (playerState == playing)
+                    mediaPlayer.stop();
                 mediaPlayer.release();
                 playerState = idle;
                 try {
@@ -210,10 +182,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        seekBar.setOnClickListener(new View.OnClickListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onClick(View view) {
-                // TODO: 29/10/2016
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
