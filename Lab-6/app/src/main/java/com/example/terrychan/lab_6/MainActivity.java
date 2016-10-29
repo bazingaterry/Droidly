@@ -29,9 +29,8 @@ import android.os.Handler;
 import static com.example.terrychan.lab_6.State.idle;
 import static com.example.terrychan.lab_6.State.paused;
 import static com.example.terrychan.lab_6.State.playing;
-import static com.example.terrychan.lab_6.State.prepared;
 
-enum State {idle, prepared, playing, paused}
+enum State {idle, playing, paused}
 
 public class MainActivity extends AppCompatActivity {
 
@@ -126,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     } else if (playerState == paused) {
                         objectAnimator.resume();
                     }
+                    mediaPlayer.seekTo(seekBar.getProgress());
                     mediaPlayer.start();
                     playerState = playing;
                     state.setText("PLAYING");
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                
+
             }
 
             @Override
@@ -195,7 +195,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                if (playerState != idle)
+                    mediaPlayer.seekTo(seekBar.getProgress());
             }
         });
     }
