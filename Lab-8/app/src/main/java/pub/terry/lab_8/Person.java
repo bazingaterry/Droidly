@@ -4,10 +4,14 @@ package pub.terry.lab_8;
  * Created by terrychan on 17/11/2016.
  */
 
-public class Person {
-    protected String name, birthday, gift;
+class Person {
+    private String name, birthday, gift;
 
-    public Person(String name, String birthday, String gift) {
+    Person() {
+
+    }
+
+    Person(String name, String birthday, String gift) {
         this.name = name;
         this.birthday = birthday;
         this.gift = gift;
