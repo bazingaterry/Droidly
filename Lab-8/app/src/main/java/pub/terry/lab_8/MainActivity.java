@@ -7,14 +7,12 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -25,8 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private Database database;
     private ListAdapter listAdapter;
     List<Person> persons;
-    final String DB_NAME = "birthdayTextView";
-    final int DB_VERSION = 1;
     final int REQUEST_CODE = 1;
 
     @Override
@@ -119,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void init() {
-        this.database = new Database(this, DB_NAME, null, DB_VERSION);
+        this.database = DatabaseSingleton.getDatabase(this);
         this.persons = database.queryAll();
         this.listAdapter = new ListAdapter(persons, this);
         this.listView.setAdapter(listAdapter);

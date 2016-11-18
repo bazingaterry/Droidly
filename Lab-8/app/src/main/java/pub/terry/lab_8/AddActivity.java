@@ -10,8 +10,6 @@ public class AddActivity extends AppCompatActivity {
 
     TextInputEditText nameTextView, birthdayTextView, giftTextView;
     private Database database;
-    final String DB_NAME = "birthdayTextView";
-    final int DB_VERSION = 1;
     final int REQUEST_CODE = 1;
 
     void makeToast(String text) {
@@ -25,7 +23,7 @@ public class AddActivity extends AppCompatActivity {
         nameTextView = (TextInputEditText) findViewById(R.id.name);
         birthdayTextView = (TextInputEditText) findViewById(R.id.birthday);
         giftTextView = (TextInputEditText) findViewById(R.id.gift);
-        database = new Database(this, DB_NAME, null, DB_VERSION);
+        database = DatabaseSingleton.getDatabase(this);
         findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

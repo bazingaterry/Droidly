@@ -7,16 +7,6 @@ package pub.terry.lab_8;
 class Person {
     private String name, birthday, gift;
 
-    Person() {
-
-    }
-
-    Person(String name, String birthday, String gift) {
-        this.name = name;
-        this.birthday = birthday;
-        this.gift = gift;
-    }
-
     public String getName() {
         return name;
     }

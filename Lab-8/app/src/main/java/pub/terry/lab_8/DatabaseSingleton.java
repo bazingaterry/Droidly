@@ -3,7 +3,6 @@ package pub.terry.lab_8;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,16 +12,11 @@ import java.util.List;
 /**
  * Created by terrychan on 17/11/2016.
  */
-
-public class Database extends SQLiteOpenHelper {
+class Database extends SQLiteOpenHelper {
     final String TABLE_NAME = "birthday_log";
 
-    public Database(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    Database(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-    }
-
-    public Database(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(context, name, factory, version, errorHandler);
     }
 
     @Override
@@ -75,5 +69,22 @@ public class Database extends SQLiteOpenHelper {
         }
         cursor.close();
         return persons;
+    }
+}
+
+
+public class DatabaseSingleton {
+    private static Database database;
+    final static String DB_NAME = "person";
+    final static int DB_VERSION = 1;
+
+    private DatabaseSingleton() {
+    }
+
+    public static synchronized Database getDatabase(Context context) {
+        if (database == null) {
+            database = new Database(context, DB_NAME, null, DB_VERSION);
+        }
+        return database;
     }
 }
