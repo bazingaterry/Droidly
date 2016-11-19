@@ -23,7 +23,7 @@ public class AddActivity extends AppCompatActivity {
         nameTextView = (TextInputEditText) findViewById(R.id.name);
         birthdayTextView = (TextInputEditText) findViewById(R.id.birthday);
         giftTextView = (TextInputEditText) findViewById(R.id.gift);
-        database = DatabaseSingleton.getDatabase(this);
+        database = Database.getDatabase(this);
         findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

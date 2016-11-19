@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void init() {
-        this.database = DatabaseSingleton.getDatabase(this);
+        this.database = Database.getDatabase(this);
         this.persons = database.queryAll();
         this.listAdapter = new ListAdapter(persons, this);
         this.listView.setAdapter(listAdapter);
