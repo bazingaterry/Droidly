@@ -14,15 +14,15 @@ import java.util.List;
  */
 
 public class RecycleAdapter extends RecyclerView.Adapter {
-    private List<String> future;
+    private List<String> futureWeathers;
     private Context context;
 
-    void setFuture(List<String> future) {
-        this.future = future;
+    void setFutureWeathers(List<String> futureWeathers) {
+        this.futureWeathers = futureWeathers;
     }
 
-    FutureAdapter(List<String> future, Context context) {
-        this.future = future;
+    RecycleAdapter(List<String> futureWeathers, Context context) {
+        this.futureWeathers = futureWeathers;
         this.context = context;
     }
 
@@ -34,7 +34,7 @@ public class RecycleAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         FutureHolder futureHolder = (FutureHolder) holder;
-        String[] contents = future.get(position).split("\n");
+        String[] contents = futureWeathers.get(position).split("\n");
         futureHolder.getFuture_data().setText((contents[0].split(" "))[0]);
         futureHolder.getFuture_weather().setText((contents[0].split(" "))[1]);
         futureHolder.getFuture_low_high().setText(contents[1]);
@@ -42,7 +42,7 @@ public class RecycleAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return future == null ? 0 : future.size();
+        return futureWeathers == null ? 0 : futureWeathers.size();
     }
 
     private class FutureHolder extends RecyclerView.ViewHolder {

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,28 +30,70 @@ public class MainActivity extends AppCompatActivity {
     private Button button;
     private EditText editText;
     private ListView tips;
-    private TextView city, update_time, temperature, highLow, humidity, airQuality, wind;
+    private TextView city, updateTime, temperature, highLow, humidity, airQuality, wind;
     private RecyclerView recyclerView;
     private Handler handler;
     private Weather weather;
     private ListAdapter listAdapter;
     private RecycleAdapter recycleAdapter;
 
+    final private int OK = 0, ERR_TOO_FAST = -1, ERR_NULL = -2, ERR_LIMIT = -3;
+
     void getView() {
         button = (Button) findViewById(R.id.btn_search);
         editText = (EditText) findViewById(R.id.input_city);
         tips = (ListView) findViewById(R.id.tips);
         city = (TextView) findViewById(R.id.city);
-        update_time = (TextView) findViewById(R.id.update_time);
-        temperature = (TextView) findViewById(R.id.tempture);
+        updateTime = (TextView) findViewById(R.id.updateTime);
+        temperature = (TextView) findViewById(R.id.temperature);
         highLow = (TextView) findViewById(R.id.low_high);
         humidity = (TextView) findViewById(R.id.humidity);
         airQuality = (TextView) findViewById(R.id.airQuality);
-        wind = (TextView) findViewById(R.id.windSpeed);
-        recyclerView = (RecyclerView) findViewById(R.id.future_weather);
+        wind = (TextView) findViewById(R.id.wind);
+        recyclerView = (RecyclerView) findViewById(R.id.futureWeather);
     }
 
     void init() {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String cityCode = editText.getText().toString();
+                        String url = String.format("http://ws.webxml.com.cn/WebServices/WeatherWS.asmx/getWeather?theCityCode=%d&theUserID=", cityCode);
+                        try {
+                            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+                            httpURLConnection.setRequestMethod("GET");
+                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                            if (httpURLConnection.getResponseCode() == 200) {
+                                StringBuilder builder = new StringBuilder();
+                                String string;
+                                while ((string = bufferedReader.readLine()) != null) {
+                                    builder.append(string + "\n");
+                                }
+                                String response = builder.toString();
+                                if (response.contains("免费用户24小时内访问超过规定数量")) {
+                                    handler.sendEmptyMessage(ERR_LIMIT);
+                                } else if (response.contains("免费用户不能使用高速访问")) {
+                                    handler.sendEmptyMessage(ERR_TOO_FAST);
+                                } else if (response.contains("查询结果为空")) {
+                                    handler.sendEmptyMessage(ERR_NULL);
+                                } else {
+                                    weather = new Weather(parseXML(response).split("\n"));
+                                    handler.sendEmptyMessage(OK);
+                                }
+                                bufferedReader.close();
+                            } else {
+                                Log.e("Network", "HTTP Error");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
         listAdapter = new ListAdapter(new ArrayList<String>(), this);
         tips.setAdapter(listAdapter);
         recycleAdapter = new RecycleAdapter(new ArrayList<String>(), this);
@@ -60,26 +103,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
-                    case 1:
+                    case OK:
                         city.setText(weather.getCity());
-                        update_time.setText(weather.getUpdateTime());
-                        temperature.setText(weather.getTempture());
+                        updateTime.setText(weather.getUpdateTime());
+                        temperature.setText(weather.getTemperature());
                         highLow.setText(weather.getLowHigh());
                         humidity.setText(weather.getHumidity());
                         airQuality.setText(weather.getAirQuality());
-                        wind.setText(weather.getWindSpeed());
+                        wind.setText(weather.getWind());
                         listAdapter.setTips(weather.getTips());
                         listAdapter.notifyDataSetChanged();
-                        recycleAdapter.setFuture(weather.getFuture());
+                        recycleAdapter.setFutureWeathers(weather.getFuture());
                         recycleAdapter.notifyDataSetChanged();
                         break;
-                    case 2:
+                    case ERR_TOO_FAST:
                         showToast("免费用户不能使用高速访问");
                         break;
-                    case 3:
+                    case ERR_NULL:
                         showToast("查询结果为空");
                         break;
-                    case 24:
+                    case ERR_LIMIT:
                         showToast("免费用户24小时内访问超过规定数量");
                         break;
                 }
@@ -87,68 +130,24 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    String praseXML(String body) throws XmlPullParserException, IOException {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
+    String parseXML(String body) throws XmlPullParserException, IOException {
+        XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+        xmlPullParserFactory.setNamespaceAware(true);
+        XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
 
         StringBuilder builder = new StringBuilder();
-        xpp.setInput(new StringReader(body));
-        int eventType = xpp.getEventType();
+        xmlPullParser.setInput(new StringReader(body));
+        int eventType = xmlPullParser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if (eventType == XmlPullParser.START_TAG) {
-                eventType = xpp.next();
+                eventType = xmlPullParser.next();
                 if (eventType == XmlPullParser.TEXT) {
-                    builder.append(xpp.getText() + "\n");
+                    builder.append(xmlPullParser.getText() + "\n");
                 }
             }
-            eventType = xpp.next();
+            eventType = xmlPullParser.next();
         }
         return builder.toString();
-    }
-
-    void setResponse() {
-        button.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View view) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String str_city = editText.getText().toString();
-                String http_request = "http://ws.webxml.com.cn/WebServices/WeatherWS.asmx/getWeather?theCityCode=" + str_city + "&theUserID=";
-                try {
-                    HttpURLConnection http = (HttpURLConnection) new URL(http_request).openConnection();
-                    http.setRequestMethod("GET");
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(http.getInputStream()));
-                    if (http.getResponseCode() == 200) {
-                        StringBuilder builder = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            builder.append(line + "\n");
-                        }
-                        String body = builder.toString();
-                        if (body.contains("免费用户24小时内访问超过规定数量")) {
-                            handler.sendEmptyMessage(24);
-                            return;
-                        } else if (body.contains("免费用户不能使用高速访问")) {
-                            handler.sendEmptyMessage(2);
-                        } else if (body.contains("查询结果为空")) {
-                            handler.sendEmptyMessage(3);
-                        } else {
-                            weather = new Weather(praseXML(body).split("\n"));
-                            handler.sendEmptyMessage(1);
-                        }
-                        reader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     void showToast(String content) {
@@ -160,5 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getView();
+        init();
     }
 }

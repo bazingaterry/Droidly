@@ -28,7 +28,7 @@ class ListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return tips == null ? 0 : tips.size();
+        return tips.size();
     }
 
     @Override
@@ -44,7 +44,7 @@ class ListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.tip_item, viewGroup, false);
+            view = LayoutInflater.from(context).inflate(R.layout.tips_item, viewGroup, false);
         }
         if (view.getTag() == null) {
             view.setTag(new TipHolder(view));
