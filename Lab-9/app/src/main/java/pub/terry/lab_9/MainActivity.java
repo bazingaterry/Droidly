@@ -37,9 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private ListAdapter listAdapter;
     private RecycleAdapter recycleAdapter;
 
-    final private int OK = 0, ERR_TOO_FAST = -1, ERR_NULL = -2, ERR_LIMIT = -3;
+    final private int OK = 0, ERR_TOO_FAST = -1, ERR_NULL = -2, ERR_LIMIT = -3, ERR_NETWORK = -4;
 
     void getView() {
+        // get view
         button = (Button) findViewById(R.id.btn_search);
         editText = (EditText) findViewById(R.id.input_city);
         tips = (ListView) findViewById(R.id.tips);
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         String cityCode = editText.getText().toString();
-                        String url = String.format("http://ws.webxml.com.cn/WebServices/WeatherWS.asmx/getWeather?theCityCode=%d&theUserID=", cityCode);
+                        String url = String.format("http://ws.webxml.com.cn/WebServices/WeatherWS.asmx/getWeather?theCityCode=%s&theUserID=", cityCode);
+//                        String url = "https://static.32ph.com/res.xml";
                         try {
                             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
                             httpURLConnection.setRequestMethod("GET");
@@ -73,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
                                     builder.append(string + "\n");
                                 }
                                 String response = builder.toString();
-                                if (response.contains("免费用户24小时内访问超过规定数量")) {
+                                if (response.contains("24小时")) {
                                     handler.sendEmptyMessage(ERR_LIMIT);
-                                } else if (response.contains("免费用户不能使用高速访问")) {
+                                } else if (response.contains("高速访问")) {
                                     handler.sendEmptyMessage(ERR_TOO_FAST);
                                 } else if (response.contains("查询结果为空")) {
                                     handler.sendEmptyMessage(ERR_NULL);
@@ -86,9 +88,11 @@ public class MainActivity extends AppCompatActivity {
                                 bufferedReader.close();
                             } else {
                                 Log.e("Network", "HTTP Error");
+                                handler.sendEmptyMessage(ERR_NETWORK);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+                            handler.sendEmptyMessage(ERR_NETWORK);
                         }
                     }
                 }).start();
@@ -116,14 +120,17 @@ public class MainActivity extends AppCompatActivity {
                         recycleAdapter.setFutureWeathers(weather.getFuture());
                         recycleAdapter.notifyDataSetChanged();
                         break;
-                    case ERR_TOO_FAST:
-                        showToast("免费用户不能使用高速访问");
-                        break;
                     case ERR_NULL:
-                        showToast("查询结果为空");
+                        makeToast("查询结果为空。");
                         break;
                     case ERR_LIMIT:
-                        showToast("免费用户24小时内访问超过规定数量");
+                        makeToast("免费用户 24 小时内访问超过规定数量。");
+                        break;
+                    case ERR_TOO_FAST:
+                        makeToast("免费用户不能高速访问。");
+                        break;
+                    case ERR_NETWORK:
+                        makeToast("网络不可用。");
                         break;
                 }
             }
@@ -134,26 +141,19 @@ public class MainActivity extends AppCompatActivity {
         XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
         xmlPullParserFactory.setNamespaceAware(true);
         XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
-
-        StringBuilder builder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         xmlPullParser.setInput(new StringReader(body));
-        int eventType = xmlPullParser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG) {
-                eventType = xmlPullParser.next();
-                if (eventType == XmlPullParser.TEXT) {
-                    builder.append(xmlPullParser.getText() + "\n");
-                }
+        while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
+            if (xmlPullParser.getEventType() == XmlPullParser.START_TAG && xmlPullParser.next() == XmlPullParser.TEXT) {
+                stringBuilder.append(xmlPullParser.getText() + "\n");
             }
-            eventType = xmlPullParser.next();
         }
-        return builder.toString();
+        return stringBuilder.toString();
     }
 
-    void showToast(String content) {
+    void makeToast(String content) {
         Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
