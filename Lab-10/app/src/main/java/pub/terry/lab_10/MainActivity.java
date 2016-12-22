@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
@@ -95,8 +94,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     void setLocationView(Location location) {
         this.location = location;
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            address.setText(addresses.get(0).getAddressLine(0));
+            Address currentAddress = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+            String addressString = "";
+            for (int i = 0; i < currentAddress.getMaxAddressLineIndex(); i++) addressString += currentAddress.getAddressLine(i);
+            address.setText(addressString);
         } catch (IOException e) {
             e.printStackTrace();
         }
